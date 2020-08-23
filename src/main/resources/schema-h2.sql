@@ -1,4 +1,6 @@
-drop table if exists employees;
+CREATE SCHEMA `company` DEFAULT CHARACTER SET utf8 ;
+
+USE `company`;
 
 CREATE TABLE `employees`
 (
