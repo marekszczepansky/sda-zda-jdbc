@@ -120,7 +120,8 @@ public class JDBCFirstApp {
 
             final String update_query = "update employees " +
                     "set email = 'hr.department@foo.com' " +
-                    "where department = 'HR'";
+                    "where department = 'HR' " +
+                    "and email != 'hr.department@foo.com' ";
             final int rows_affected = myStatement.executeUpdate(update_query);
 
             System.out.println(rows_affected + " rows update in the table");
@@ -130,7 +131,18 @@ public class JDBCFirstApp {
     }
 
     private static void deleteEmployee() {
+        try (Connection myCon = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+            Statement myStatement = myCon.createStatement();
+            System.out.println("Deleting the row 'John Doe' from the table");
 
+            final String delete_query = "delete from employees " +
+                    "where last_name = 'Doe' and first_name = 'John'";
+            final int rows_affected = myStatement.executeUpdate(delete_query);
+
+            System.out.println(rows_affected + " rows deleted from the table");
+        } catch (Exception throwable) {
+            System.out.println("Error");
+        }
     }
 
     private static void queryForDepartment(String department) {
