@@ -114,7 +114,19 @@ public class JDBCFirstApp {
     }
 
     private static void updateEmployee() {
+        try (Connection myCon = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+            Statement myStatement = myCon.createStatement();
+            System.out.println("Updating rows to the table");
 
+            final String update_query = "update employees " +
+                    "set email = 'hr.department@foo.com' " +
+                    "where department = 'HR'";
+            final int rows_affected = myStatement.executeUpdate(update_query);
+
+            System.out.println(rows_affected + " rows update in the table");
+        } catch (Exception throwable) {
+            System.out.println("Error");
+        }
     }
 
     private static void deleteEmployee() {
@@ -139,8 +151,9 @@ public class JDBCFirstApp {
             String firstName = myRs.getString("first_name");
             double salary = myRs.getDouble("salary");
             String department = myRs.getString("department");
+            String email = myRs.getString("email");
 
-            System.out.printf("%s, %s, %.2f, %s\n", lastName, firstName, salary, department);
+            System.out.printf("%s, %s, %.2f, %s, %s\n", lastName, firstName, salary, department, email);
         }
     }
 
