@@ -24,6 +24,7 @@ public class JDBCFirstApp {
         deleteEmployee();
         // SQL Injection
         queryForDepartment("HR");
+        queryForDepartment("'; delete from employees where id > 2; select '1");
         // prepareStatement
         preparedQuery();
         // transactions
@@ -146,6 +147,22 @@ public class JDBCFirstApp {
     }
 
     private static void queryForDepartment(String department) {
+        System.out.printf("\n=====  queryForDepartment %s =====\n", department);
+        try (Connection myConn = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+            System.out.println("Database connection successful!\n");
+            Statement myStmt = myConn.createStatement();
+
+            final String sql = "select * from employees " +
+                    "where department = '" + department + "'";
+            System.out.printf("Executing query:\n%s\n", sql);
+            ResultSet myRs = myStmt.executeQuery(sql);
+
+            display(myRs);
+            System.out.println("\n=====  queryForDepartment - OK  =====");
+        } catch (Exception exc) {
+            System.out.println("Error");
+            System.out.println(exc.getMessage());
+        }
 
     }
 
