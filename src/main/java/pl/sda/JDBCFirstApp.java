@@ -28,6 +28,8 @@ public class JDBCFirstApp {
         preparedQuery();
         // transactions
         transactionalUpdate();
+        System.out.println("\n--== Final table state ==--");
+        selectAllNice();
 
 
     }
@@ -95,6 +97,20 @@ public class JDBCFirstApp {
     }
 
     private static void insertEmployee() {
+        try (Connection myCon = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+            Statement myStatement = myCon.createStatement();
+            System.out.println("Inserting a row to the table");
+
+            final String insert_query = "insert into employees " +
+                    "(last_name, first_name, email, department, salary) " +
+                    "values " +
+                    "('Szczepanski', 'Marek','marek@sda.pl', 'Software', 90000)";
+            final int rows_affected = myStatement.executeUpdate(insert_query);
+
+            System.out.println(rows_affected + " new rows inserted to the table");
+        } catch (Exception throwable) {
+            System.out.println("Error");
+        }
     }
 
     private static void updateEmployee() {
