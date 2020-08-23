@@ -2,6 +2,7 @@ package pl.sda;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -26,7 +27,8 @@ public class JDBCFirstApp {
         queryForDepartment("HR");
         queryForDepartment("'; delete from employees where id > 2; select '1");
         // prepareStatement
-        preparedQuery();
+        preparedQuery("HR");
+        preparedQuery("'; delete from employees where id > 2; select '1");
         // transactions
         transactionalUpdate();
         System.out.println("\n--== Final table state ==--");
@@ -163,14 +165,49 @@ public class JDBCFirstApp {
             System.out.println("Error");
             System.out.println(exc.getMessage());
         }
-
     }
 
-    private static void preparedQuery() {
+    private static void preparedQuery(String department) {
+        System.out.printf("\n=====  preparedQuery %s =====\n", department);
+        try (Connection myConn = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+            System.out.println("Database connection successful!\n");
+            final String sql = "select * from employees " +
+                    "where department = ?";
+            PreparedStatement myStmt = myConn.prepareStatement(sql);
+            myStmt.setString(1, department);
 
+            System.out.printf("Executing query:\n%s\n", sql);
+            ResultSet myRs = myStmt.executeQuery();
+
+            display(myRs);
+            System.out.println("\n=====  preparedQuery - OK  =====");
+        } catch (Exception exc) {
+            System.out.println("Error");
+            System.out.println(exc.getMessage());
+        }
     }
 
     private static void transactionalUpdate() {
+        try (Connection myCon = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+            myCon.setAutoCommit(false);
+
+            Statement myStatement = myCon.createStatement();
+            // step 1
+            final int step1Result = myStatement.executeUpdate("delete from employees where department = 'HR'");
+            System.out.println("Transaction steps 1 ready, result " + step1Result);
+            // step 2
+            final int step2Result = myStatement.executeUpdate("update employees " +
+                    "set salary = 300000 " +
+                    "where department = 'Engineering'");
+
+            System.out.println("Transaction step 2 ready, result " + step2Result);
+
+            // store to db
+            myCon.commit();
+            System.out.println("Transaction committed");
+        } catch (Exception throwable) {
+            System.out.println("Error");
+        }
 
     }
 
