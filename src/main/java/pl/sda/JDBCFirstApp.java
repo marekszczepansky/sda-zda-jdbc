@@ -15,7 +15,7 @@ public class JDBCFirstApp {
     public static void main(String[] args) throws SQLException {
 
         // Connection, Statement, executeQuery, Exceptions
-        selectAll();
+//        selectAll();
         // try-with-resources
         selectAllNice();
         // executeUpdate
@@ -51,9 +51,9 @@ public class JDBCFirstApp {
 
             // 4. Process the result set
             while (myRs.next()) {
-                String emploee = myRs.getString("last_name")
+                String employee = myRs.getString("last_name")
                         + ", " + myRs.getString("first_name");
-                System.out.println(emploee);
+                System.out.println(employee);
             }
             System.out.println("\n=====  selectAll - OK  =====");
         } catch (Exception exc) {
@@ -72,8 +72,26 @@ public class JDBCFirstApp {
         }
     }
 
-    private static void selectAllNice() {
+    private static void selectAllNice() throws SQLException {
 
+        System.out.println("\n=====  selectAllNice  =====");
+        // 1. Get a connection to database
+        try (Connection myConn = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+            System.out.println("Database connection successful!\n");
+
+            // 2. Create a statement
+            Statement myStmt = myConn.createStatement();
+
+            // 3. Execute SQL query
+            ResultSet myRs = myStmt.executeQuery("select * from employees");
+
+            // 4. Process the result set
+            display(myRs);
+            System.out.println("\n=====  selectAllNice - OK  =====");
+        } catch (Exception exc) {
+//            exc.printStackTrace();
+            System.out.println("Error");
+        }
     }
 
     private static void insertEmployee() {
